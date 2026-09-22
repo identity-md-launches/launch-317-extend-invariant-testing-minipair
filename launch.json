@@ -1,0 +1,22 @@
+{
+  "kind": "evm_project",
+  "token": {
+    "contract": "MiniSwapToken",
+    "name": "Mini Swap",
+    "symbol": "MSWAP",
+    "decimals": 18
+  },
+  "contracts": [
+    {
+      "contract": "MiniPair",
+      "constructorArgs": ["$token", "30"]
+    }
+  ],
+  "pool": {
+    "pairedCurrency": "0x0000000000000000000000000000000000000000",
+    "fee": 3000,
+    "tickSpacing": 60,
+    "initialPrice": "79228162514264337593543950336"
+  },
+  "notes": "Mini Swap ($MSWAP) test launch on Sepolia (chainId 11155111) under pinned policy v5. Token: MiniSwapToken (src/MiniSwapToken.sol), plain OpenZeppelin v5.0.2 ERC20, name 'Mini Swap', symbol 'MSWAP', 18 decimals, no constructor arguments, no ETH; the constructor mints the whole fixed supply of 1,000,000,000 MSWAP (10^27 minor units) to msg.sender, which at launch is the ProjectFactory. No owner, mint, burn, pause, blacklist, tax, initializer, proxy or upgrade path; runtime has no DELEGATECALL, CALLCODE or SELFDESTRUCT. Application contract: MiniPair (src/MiniPair.sol), constructor(address token_, uint256 feeBps_) nonpayable, deployed after the token with constructorArgs [$token, 30]: $token is the launch token address (address-typed argument) and 30 is the swap fee in basis points (0.30%, bounded by MAX_FEE_BPS = 1000). MiniPair is adminless: no owner, no $owner argument, no protocol fee, no pause, no upgrade, no rescue function, no post-deploy initialization call, no constructor ETH. It is a constant-product ETH/MSWAP pool with internal share accounting (no LP token); the first user deposit sets its price and permanently locks 1000 minimum shares to address(0). Reserves are tracked internally, so donations do not move quotes. Every ETH-sending path is nonReentrant with effects before interactions. The pool section describes the protocol pool the factory creates: native ETH (zero address) paired currency, fee 3000, tickSpacing 60, no hook, token-only liquidity with no ETH funding. initialPrice is sqrtPriceX96 = 2^96 (1:1) retained for provenance; the deployer derives the effective opening price from policy v5 (20 ETH opening FDV for all 1 billion tokens), which overrides this value. Supply, reward splits (2% launch contributors, 8% recent accepted work, 80% LP, 10% treasury, one-hour unlock), treasury, chainId and policyVersion come from the frozen policy, not from this manifest. Dependency order: token first, then MiniPair (references only $token). Build: solc 0.8.26, cancun, optimizer 200 runs, via_ir false, bytecode_hash none, cbor_metadata false, offline. ABIs in docs/abi/MiniSwapToken.json and docs/abi/MiniPair.json with canonical hashes in docs/abi-hashes.json. Tests: 53 Foundry tests (unit, fuzz, invariant) plus the protected Token and Project floors pass locally. Operational notes: MiniPair starts empty and unseeded; whoever adds the first liquidity sets its price and should match the protocol pool to avoid arbitrage. Smart-contract callers must accept ETH to remove liquidity or sell tokens. This manifest is descriptive; deployment authority, attestation and admission belong to the later services."
+}
